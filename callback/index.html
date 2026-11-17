@@ -23,7 +23,10 @@ button:disabled{background:#7c8792}small{color:#526170}label{display:block;margi
 <label for="code">認証コード</label>
 <textarea id="code" readonly autocomplete="off" spellcheck="false"></textarea>
 <p><button id="copy" type="button">認証コードをコピー</button></p>
-<small>Grok Botの認証専用フォームに入力してください。通常のチャットや他の人には送らないでください。連携が終わったら、このページを閉じてください。</small>
+<label for="state">確認用ID（state）</label>
+<textarea id="state" readonly autocomplete="off" spellcheck="false"></textarea>
+<p><button id="copy-state" type="button">確認用IDをコピー</button></p>
+<small>認証コードと確認用IDを、Grok Botの認証専用フォームに入力してください。通常のチャットや他の人には送らないでください。連携が終わったら、このページを閉じてください。</small>
 </section>
 <p><small>このページから外部への通信や、認証コードの保存は行いません。</small></p>
 </main>
@@ -32,18 +35,24 @@ button:disabled{background:#7c8792}small{color:#526170}label{display:block;margi
 const params=new URLSearchParams(location.search);
 const code=params.get('code');
 const error=params.get('error');
+const state=params.get('state');
 history.replaceState(null,'',location.pathname);
 const status=document.getElementById('status');
 if(error){
  status.textContent='認証は完了していません。Teslaの画面で拒否またはエラーが返されました。Grok Botから認証をやり直してください。';
 }else if(code){
  document.getElementById('code').value=code;
+ document.getElementById('state').value=state||'';
  document.getElementById('result').hidden=false;
  status.textContent='認証コードを受け取りました。Grok Botの認証専用フォームに入力して、連携を完了してください。';
 }
 document.getElementById('copy').addEventListener('click',async function(){
  try{await navigator.clipboard.writeText(code);this.textContent='コピーしました';}
  catch{document.getElementById('code').select();status.textContent='認証コードを選択しました。コピーして認証専用フォームに入力してください。';}
+});
+document.getElementById('copy-state').addEventListener('click',async function(){
+ try{await navigator.clipboard.writeText(state||'');this.textContent='コピーしました';}
+ catch{document.getElementById('state').select();status.textContent='確認用IDを選択しました。コピーして認証専用フォームに入力してください。';}
 });
 </script>
 </body>
