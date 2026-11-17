@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Teslaの認証コード</title>
+<style>
+body{font:17px/1.7 system-ui,sans-serif;background:#f3f5f7;color:#17212c;margin:0;padding:40px 20px}
+main{max-width:660px;margin:40px auto;background:white;border-radius:18px;padding:32px}
+h1{font-size:25px;margin:0 0 16px}textarea{box-sizing:border-box;width:100%;min-height:110px;font:16px/1.5 monospace;padding:14px;border:1px solid #abb7c4;border-radius:8px;resize:vertical}
+button{font:inherit;color:white;background:#1859ba;border:0;border-radius:8px;padding:12px 22px;cursor:pointer}
+button:disabled{background:#7c8792}small{color:#526170}label{display:block;margin-top:20px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Teslaの認証コード</h1>
+<p id="status" role="status">Teslaの認証画面から戻ると、ここに認証コードが表示されます。</p>
+<section id="result" hidden>
+<label for="code">認証コード</label>
+<textarea id="code" readonly autocomplete="off" spellcheck="false"></textarea>
+<p><button id="copy" type="button">認証コードをコピー</button></p>
+<small>Grok Botの認証専用フォームに入力してください。通常のチャットや他の人には送らないでください。連携が終わったら、このページを閉じてください。</small>
+</section>
+<p><small>このページから外部への通信や、認証コードの保存は行いません。</small></p>
+</main>
+<script>
+'use strict';
+const params=new URLSearchParams(location.search);
+const code=params.get('code');
+const error=params.get('error');
+history.replaceState(null,'',location.pathname);
+const status=document.getElementById('status');
+if(error){
+ status.textContent='認証は完了していません。Teslaの画面で拒否またはエラーが返されました。Grok Botから認証をやり直してください。';
+}else if(code){
+ document.getElementById('code').value=code;
+ document.getElementById('result').hidden=false;
+ status.textContent='認証コードを受け取りました。Grok Botの認証専用フォームに入力して、連携を完了してください。';
+}
+document.getElementById('copy').addEventListener('click',async function(){
+ try{await navigator.clipboard.writeText(code);this.textContent='コピーしました';}
+ catch{document.getElementById('code').select();status.textContent='認証コードを選択しました。コピーして認証専用フォームに入力してください。';}
+});
+</script>
+</body>
+</html>
